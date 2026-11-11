@@ -7,6 +7,41 @@ interface Bank {
   fullName: string | null;
 }
 
+/**
+ * A BrasilAPI usa a razão social (ex.: "NU PAGAMENTOS - IP"), não a marca que as pessoas conhecem.
+ * Estes apelidos levam o nome popular ao código COMPE.
+ */
+export const BANK_ALIASES: Record<string, number> = {
+  nubank: 260,
+  nu: 260,
+  inter: 77,
+  "banco inter": 77,
+  c6: 336,
+  "c6 bank": 336,
+  picpay: 380,
+  "mercado pago": 323,
+  mercadopago: 323,
+  pagbank: 290,
+  pagseguro: 290,
+  caixa: 104,
+  cef: 104,
+  "caixa economica": 104,
+  bb: 1,
+  "banco do brasil": 1,
+  itau: 341,
+  bradesco: 237,
+  santander: 33,
+  btg: 208,
+  "btg pactual": 208,
+  xp: 102,
+  sicoob: 756,
+  sicredi: 748,
+  banrisul: 41,
+  safra: 422,
+  bv: 655,
+  stone: 197,
+};
+
 export const buscarBanco: Tool = {
   name: "buscar_banco",
   title: "Buscar banco",
@@ -31,11 +66,15 @@ export const buscarBanco: Tool = {
     const isCode = /^\d+$/.test(busca);
     const term = fold(busca);
 
+    const aliasCode = BANK_ALIASES[term.replace(/\s+/g, " ")];
+
     const matches = banks.filter((b) =>
       isCode
         ? b.code === Number(busca) || b.ispb === busca.padStart(8, "0")
-        : fold(`${b.name ?? ""} ${b.fullName ?? ""}`).includes(term),
+        : b.code === aliasCode || fold(`${b.name ?? ""} ${b.fullName ?? ""}`).includes(term),
     );
+    // O apelido (marca) vem primeiro, antes das ocorrências por trecho do nome.
+    if (aliasCode !== undefined) matches.sort((a, b) => Number(b.code === aliasCode) - Number(a.code === aliasCode));
 
     if (matches.length === 0) return fail(`Nenhum banco encontrado para "${busca}".`);
     return json({

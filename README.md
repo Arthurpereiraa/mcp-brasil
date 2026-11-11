@@ -1,6 +1,6 @@
 # 🇧🇷 mcp-brasil
 
-[![CI](https://github.com/SEU_USUARIO/mcp-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/SEU_USUARIO/mcp-brasil/actions/workflows/ci.yml)
+[![CI](https://github.com/arthurpereiraa/mcp-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurpereiraa/mcp-brasil/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/mcp-brasil)](https://www.npmjs.com/package/mcp-brasil)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![zero dependências](https://img.shields.io/badge/dependências-0-blue)
@@ -107,7 +107,7 @@ Algumas decisões de projeto:
 
 ```bash
 npm install
-npm test            # 46 testes com node:test, API mockada (roda offline)
+npm test            # 48 testes com node:test, API mockada (roda offline)
 npm run typecheck
 npm run build
 npm run inspector   # abre o MCP Inspector para testar as ferramentas na mão

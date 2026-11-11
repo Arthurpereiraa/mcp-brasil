@@ -91,6 +91,19 @@ describe("buscar_banco", () => {
     assert.equal(r.data.resultados[0].nome, "NU PAGAMENTOS - IP");
   });
 
+  it("encontra pela marca mesmo quando a razão social é outra (nubank → NU PAGAMENTOS)", async () => {
+    const { server } = makeServer({ "/banks/v1": banks });
+    const r = await callTool(server, "buscar_banco", { busca: "Nubank" });
+    assert.equal(r.isError, false);
+    assert.equal(r.data.resultados[0].codigo, 260);
+  });
+
+  it("o apelido aparece primeiro quando também há ocorrências pelo nome", async () => {
+    const { server } = makeServer({ "/banks/v1": banks });
+    const r = await callTool(server, "buscar_banco", { busca: "banco do brasil" });
+    assert.equal(r.data.resultados[0].codigo, 1);
+  });
+
   it("busca por nome ignorando acentos e caixa", async () => {
     const { server } = makeServer({ "/banks/v1": banks });
     const r = await callTool(server, "buscar_banco", { busca: "itau" });
