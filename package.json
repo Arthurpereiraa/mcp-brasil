@@ -1,0 +1,52 @@
+{
+  "name": "mcp-brasil",
+  "version": "0.1.0",
+  "description": "Servidor MCP com dados públicos do Brasil (CEP, CNPJ, bancos, feriados, FIPE, DDD, taxas, IBGE, Registro.br) e validadores de CPF/CNPJ. Zero dependências.",
+  "type": "module",
+  "bin": {
+    "mcp-brasil": "dist/index.js"
+  },
+  "main": "dist/server.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "brasil",
+    "brasilapi",
+    "cep",
+    "cnpj",
+    "cpf",
+    "fipe",
+    "feriados",
+    "claude",
+    "llm",
+    "ai-agents"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEU_USUARIO/mcp-brasil.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
