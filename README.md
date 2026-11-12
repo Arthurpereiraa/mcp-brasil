@@ -1,6 +1,6 @@
 # 🇧🇷 mcp-brasil
 
-[![CI](https://github.com/arthurpereiraa/mcp-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurpereiraa/mcp-brasil/actions/workflows/ci.yml)
+[![CI](https://github.com/Arthurpereiraa/mcp-brasil/actions/workflows/ci.yml/badge.svg)](https://github.com/Arthurpereiraa/mcp-brasil/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/mcp-brasil)](https://www.npmjs.com/package/mcp-brasil)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![zero dependências](https://img.shields.io/badge/dependências-0-blue)

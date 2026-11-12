@@ -1,5 +1,12 @@
 # Changelog
 
+## [Não lançado]
+
+### Alterado
+- CI usa `npm ci` com cache agora que o projeto tem `package-lock.json`.
+- Release publica no npm via trusted publishing (OIDC), sem token salvo no GitHub, e pula a publicação se a versão já existir.
+- `buscar_banco` reconhece nomes de marca (Nubank, Inter, C6, PicPay...).
+
 ## [0.1.0] - 2026-11-11
 
 ### Adicionado

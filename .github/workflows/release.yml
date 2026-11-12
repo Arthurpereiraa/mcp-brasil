@@ -1,14 +1,17 @@
 name: Release
 
-# Publica no npm quando você cria uma tag v*, ex.: git tag v0.1.0 && git push --tags
-# Requer o secret NPM_TOKEN (Settings → Secrets and variables → Actions).
+# Publica no npm quando você cria uma tag v*, ex.: git tag v0.2.0 && git push --tags
+#
+# Usa trusted publishing (OIDC): não há token do npm guardado no GitHub.
+# Configuração única em npmjs.com → pacote → Settings → Trusted Publisher → GitHub Actions,
+# com o workflow "release.yml". A primeira versão precisa ser publicada manualmente (npm publish).
 on:
   push:
     tags: ["v*"]
 
 permissions:
-  contents: write
-  id-token: write
+  contents: write # criar a GitHub Release
+  id-token: write # trusted publishing no npm
 
 jobs:
   publish:
@@ -17,12 +20,31 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24 # já traz npm >= 11.5.1, exigido pelo trusted publishing
           registry-url: https://registry.npmjs.org
-      - run: npm install
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - name: Confere se a tag bate com a versão do package.json
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::A tag $GITHUB_REF_NAME não bate com a versão $VERSION do package.json"
+            exit 1
+          fi
+
+      - name: Publica no npm (pula se a versão já existir)
+        run: |
+          NAME="$(node -p "require('./package.json').name")"
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "$NAME@$VERSION" version > /dev/null 2>&1; then
+            echo "$NAME@$VERSION já está no npm; pulando a publicação."
+          else
+            npm publish --access public
+          fi
+
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
