@@ -1,4 +1,4 @@
-import { calcularDiasUteis, feriadosNacionais } from "./calendario.js";
+import { calcularDiasUteis, calcularPrazo, feriadosNacionais } from "./calendario.js";
 import { consultarCnpj, consultarDominioBr, validarDocumento } from "./empresas.js";
 import { consultarCep, consultarDdd, listarMunicipios } from "./enderecos.js";
 import { buscarBanco, consultarTaxas, fipeMarcas, fipePreco } from "./financeiro.js";
@@ -13,6 +13,7 @@ export const allTools: readonly Tool[] = [
   consultarTaxas,
   feriadosNacionais,
   calcularDiasUteis,
+  calcularPrazo,
   consultarDdd,
   listarMunicipios,
   fipeMarcas,

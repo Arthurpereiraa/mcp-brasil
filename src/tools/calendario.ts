@@ -54,6 +54,91 @@ export const feriadosNacionais: Tool = {
   },
 };
 
+/** Carrega os feriados sob demanda, um ano por vez, e responde se uma data é dia útil. */
+function criarCalendario(api: BrasilApi) {
+  const anos = new Map<number, Promise<Map<string, string>>>();
+  const feriadosDe = (ano: number) => {
+    let p = anos.get(ano);
+    if (!p) {
+      p = feriadosDoAno(api, ano).then((lista) => new Map(lista.map((f) => [f.date, f.name])));
+      anos.set(ano, p);
+    }
+    return p;
+  };
+  return {
+    /** Nome do feriado se a data for feriado nacional em dia de semana; undefined caso contrário. */
+    async feriado(d: Date): Promise<string | undefined> {
+      return (await feriadosDe(d.getUTCFullYear())).get(iso(d));
+    },
+    async diaUtil(d: Date): Promise<boolean> {
+      const dow = d.getUTCDay();
+      if (dow === 0 || dow === 6) return false;
+      return (await this.feriado(d)) === undefined;
+    },
+  };
+}
+
+const proximoDia = (d: Date) => new Date(d.getTime() + 86_400_000);
+
+export const calcularPrazo: Tool = {
+  name: "calcular_prazo",
+  title: "Calcular prazo / vencimento",
+  description:
+    "Calcula a data final de um prazo: soma N dias úteis a uma data (pulando fins de semana e feriados nacionais, sem contar o dia inicial) " +
+    "ou N dias corridos (prorrogando para o próximo dia útil se cair em fim de semana ou feriado). " +
+    "Use para vencimentos, SLAs e prazos contratuais. Não considera feriados estaduais ou municipais.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      data_inicio: { type: "string", description: "Data inicial, AAAA-MM-DD (não entra na contagem)", pattern: DATE_PATTERN },
+      dias: { type: "integer", description: "Quantidade de dias do prazo", minimum: 1, maximum: 3650 },
+      tipo: { type: "string", enum: ["uteis", "corridos"], description: "Dias úteis (padrão) ou corridos" },
+    },
+    required: ["data_inicio", "dias"],
+    additionalProperties: false,
+  },
+  annotations: REMOTE,
+  async handler(args, { api }) {
+    const inicio = parseIsoDate(String(args.data_inicio));
+    if (!inicio) return fail("Data inválida: use o formato AAAA-MM-DD com uma data que exista.");
+    const dias = args.dias as number;
+    const tipo = (args.tipo as "uteis" | "corridos" | undefined) ?? "uteis";
+    const cal = criarCalendario(api);
+
+    let fim = inicio;
+    let prorrogado = false;
+    if (tipo === "uteis") {
+      for (let contados = 0; contados < dias; ) {
+        fim = proximoDia(fim);
+        if (await cal.diaUtil(fim)) contados++;
+      }
+    } else {
+      fim = new Date(inicio.getTime() + dias * 86_400_000);
+      while (!(await cal.diaUtil(fim))) {
+        fim = proximoDia(fim);
+        prorrogado = true;
+      }
+    }
+
+    const feriados: Array<{ data: string; nome: string }> = [];
+    for (let d = proximoDia(inicio); d <= fim; d = proximoDia(d)) {
+      const dow = d.getUTCDay();
+      const nome = dow !== 0 && dow !== 6 ? await cal.feriado(d) : undefined;
+      if (nome) feriados.push({ data: iso(d), nome });
+    }
+
+    return json({
+      data_inicio: iso(inicio),
+      dias,
+      tipo,
+      data_final: iso(fim),
+      dia_semana: DIAS_SEMANA[fim.getUTCDay()],
+      ...(tipo === "corridos" ? { prorrogado_para_dia_util: prorrogado } : {}),
+      feriados_em_dia_util_no_periodo: feriados,
+    });
+  },
+};
+
 export const calcularDiasUteis: Tool = {
   name: "calcular_dias_uteis",
   title: "Calcular dias úteis",

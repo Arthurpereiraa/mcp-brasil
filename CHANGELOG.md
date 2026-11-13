@@ -1,6 +1,9 @@
 # Changelog
 
-## [Não lançado]
+## [0.2.0] - 2026-11-12
+
+### Adicionado
+- Ferramenta `calcular_prazo`: soma N dias úteis ou corridos a uma data, com prorrogação para o próximo dia útil.
 
 ### Alterado
 - CI usa `npm ci` com cache agora que o projeto tem `package-lock.json`.

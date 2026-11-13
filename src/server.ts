@@ -8,12 +8,12 @@ import { validateArgs, ValidationError } from "./lib/schema.js";
 import { allTools, type Tool, type ToolContext, type ToolResult } from "./tools/index.js";
 
 export const SERVER_NAME = "mcp-brasil";
-export const SERVER_VERSION = "0.1.0";
+export const SERVER_VERSION = "0.2.0";
 export const SUPPORTED_PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"] as const;
 
 const INSTRUCTIONS =
   "Ferramentas com dados públicos do Brasil via BrasilAPI. Use validar_documento antes de consultar_cnpj quando " +
-  "não tiver certeza do número; para prazos, prefira calcular_dias_uteis a contar dias manualmente.";
+  "não tiver certeza do número; para prazos e vencimentos, use calcular_prazo ou calcular_dias_uteis em vez de contar dias manualmente.";
 
 type JsonRpcId = string | number | null;
 

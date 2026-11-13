@@ -1,6 +1,6 @@
 {
   "name": "mcp-brasil",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Servidor MCP com dados públicos do Brasil (CEP, CNPJ, bancos, feriados, FIPE, DDD, taxas, IBGE, Registro.br) e validadores de CPF/CNPJ. Zero dependências.",
   "type": "module",
   "bin": {

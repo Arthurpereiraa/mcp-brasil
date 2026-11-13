@@ -148,6 +148,50 @@ describe("calcular_dias_uteis", () => {
   });
 });
 
+describe("calcular_prazo", () => {
+  const routes = { "/feriados/v1/2026": FERIADOS_2026, "/feriados/v1/2027": FERIADOS_2027 };
+
+  it("soma dias úteis sem contar o dia inicial e pulando feriados", async () => {
+    const { server } = makeServer(routes);
+    // Qua 18/11 + 5 úteis: 19 (1), 20 é feriado, fim de semana, 23 (2), 24 (3), 25 (4), 26 (5).
+    const r = await callTool(server, "calcular_prazo", { data_inicio: "2026-11-18", dias: 5 });
+    assert.equal(r.isError, false);
+    assert.equal(r.data.data_final, "2026-11-26");
+    assert.equal(r.data.dia_semana, "quinta-feira");
+    assert.equal(r.data.tipo, "uteis");
+    assert.deepEqual(r.data.feriados_em_dia_util_no_periodo, [{ data: "2026-11-20", nome: "Dia da consciência negra" }]);
+  });
+
+  it("atravessa a virada do ano buscando os feriados dos dois anos", async () => {
+    const { server, calls } = makeServer(routes);
+    // Qua 30/12 + 2 úteis: 31 (1), 01/01 feriado, fim de semana, seg 04/01 (2).
+    const r = await callTool(server, "calcular_prazo", { data_inicio: "2026-12-30", dias: 2 });
+    assert.equal(r.data.data_final, "2027-01-04");
+    assert.equal(calls.length, 2);
+  });
+
+  it("dias corridos que caem em feriado são prorrogados para o próximo dia útil", async () => {
+    const { server } = makeServer(routes);
+    // 10/11 + 10 corridos = sex 20/11 (feriado) → sáb, dom → seg 23/11.
+    const r = await callTool(server, "calcular_prazo", { data_inicio: "2026-11-10", dias: 10, tipo: "corridos" });
+    assert.equal(r.data.data_final, "2026-11-23");
+    assert.equal(r.data.prorrogado_para_dia_util, true);
+  });
+
+  it("dias corridos em dia útil não são prorrogados", async () => {
+    const { server } = makeServer(routes);
+    const r = await callTool(server, "calcular_prazo", { data_inicio: "2026-11-10", dias: 2, tipo: "corridos" });
+    assert.equal(r.data.data_final, "2026-11-12");
+    assert.equal(r.data.prorrogado_para_dia_util, false);
+  });
+
+  it("valida a data e a quantidade de dias", async () => {
+    const { server } = makeServer(routes);
+    assert.equal((await callTool(server, "calcular_prazo", { data_inicio: "2026-02-30", dias: 1 })).isError, true);
+    assert.equal((await callTool(server, "calcular_prazo", { data_inicio: "2026-11-10", dias: 0 })).isError, true);
+  });
+});
+
 describe("feriados_nacionais", () => {
   it("adiciona o dia da semana e filtra os próximos", async () => {
     const { server } = makeServer({ "/feriados/v1/2026": FERIADOS_2026 });
