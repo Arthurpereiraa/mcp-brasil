@@ -28,6 +28,7 @@ Claude: → calcular_dias_uteis(2026-11-11, 2026-12-25)
 | `consultar_taxas` | Selic, CDI e IPCA atuais | ✅ |
 | `feriados_nacionais` | Feriados do ano com o dia da semana | ✅ |
 | `calcular_dias_uteis` | Dias úteis entre duas datas, descontando feriados nacionais | ✅ |
+| `calcular_prazo` | Data final de um prazo de N dias úteis ou corridos (com prorrogação) | ✅ |
 | `consultar_ddd` | UF e cidades de um DDD | ✅ |
 | `listar_municipios` | Municípios de uma UF com o código IBGE | ✅ |
 | `fipe_marcas` | Marcas de carros, motos e caminhões | ✅ |
@@ -77,7 +78,7 @@ Use a mesma configuração acima em `.cursor/mcp.json`, `~/.codeium/windsurf/mcp
 ## Exemplos de prompts
 
 - "Valide esses CNPJs e me diga quais estão ativos: …"
-- "Qual o prazo de 15 dias úteis a partir de 18/12/2026?"
+- "Qual o vencimento de 15 dias úteis a partir de 18/12/2026?"
 - "Quanto vale um Gol 2012 na FIPE?"
 - "Qual banco é o 077 e qual o ISPB dele?"
 - "O domínio padariadojoao.com.br está livre?"
@@ -107,7 +108,7 @@ Algumas decisões de projeto:
 
 ```bash
 npm install
-npm test            # 48 testes com node:test, API mockada (roda offline)
+npm test            # 53 testes com node:test, API mockada (roda offline)
 npm run typecheck
 npm run build
 npm run inspector   # abre o MCP Inspector para testar as ferramentas na mão
